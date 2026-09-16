@@ -1,0 +1,22 @@
+# Entornos virtuales y dependencias
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Variables de entorno y secretos
+.env
+
+# Base de datos vectorial y resultados (Evitar subir archivos pesados)
+db_local/
+
+# Documentos crudos (Protección de copyright y peso)
+data/manuales/*.pdf
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+*.log

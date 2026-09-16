@@ -1,0 +1,27 @@
+services:
+  api:
+    build: .
+    container_name: rag_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app 
+      # Actualizamos la ruta del volumen de Chroma a la nueva carpeta
+      - chroma_data:/app/db_local/chroma_data
+    # Le indicamos a uvicorn que busque api dentro de src/
+    command: uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build: .
+    container_name: rag_frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    depends_on:
+      - api
+    # Le indicamos a streamlit que el app.py está en src/
+    command: streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
+
+volumes:
+  chroma_data:

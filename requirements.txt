@@ -1,0 +1,11 @@
+pymupdf
+sentence-transformers
+chromadb
+requests
+langchain<0.2.0
+langchain-community<0.2.0
+ragas
+datasets
+fastapi
+uvicorn
+streamlit

@@ -1,0 +1,14 @@
+[
+  {
+    "question": "¿Qué precauciones de temperatura debo tener con el simulador?",
+    "ground_truth": "El simulador no debe superar los 40°C ni bajar de 4°C. No debe almacenarse a menos de -15°C y se apagará automáticamente si la batería excede los 60°C."
+  },
+  {
+    "question": "¿Cómo se cambia la dentadura superior del SimMan Essential?",
+    "ground_truth": "Se debe cambiar por el juego de dientes duros incluido en el sistema SimMan Essential, consultando la sección específica de cambio de dentadura."
+  },
+  {
+    "question": "¿Cuál es la dosis recomendada de paracetamol para el simulador?",
+    "ground_truth": "No encuentro información suficiente en los manuales proporcionados."
+  }
+]
