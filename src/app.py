@@ -64,7 +64,7 @@ def enviar_feedback_api(pregunta, respuesta, fuentes, valoracion):
             },
             timeout=5
         )
-    except Exception:
+    except Exception as e:
         st.error(f"Error de conexión al guardar el voto: {e}")
         # Si el log falla, no queremos bloquear la interfaz al usuario
 
