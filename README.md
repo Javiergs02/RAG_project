@@ -1,5 +1,4 @@
 
-```markdown
 # 🏥 Asistente RAG Dinámico para Documentación Técnica
 
 Sistema **RAG (Retrieval-Augmented Generation)** contenerizado y basado en sesiones, diseñado específicamente para la consulta interactiva y el análisis de manuales técnicos y documentación médica. Su arquitectura prioriza la precisión documental, la trazabilidad estricta y la total privacidad de los datos mediante inferencia local.
@@ -49,7 +48,6 @@ Interactuar directamente con un modelo de lenguaje (como Llama 3.2) presenta lim
 ├── docker-compose.yml
 └── README.md
 
-```
 
 ---
 
@@ -91,7 +89,3 @@ Abre tu navegador e introduce la URL: **`http://localhost:8501`**.
 * **Carga documental:** Utiliza el panel lateral izquierdo en Streamlit para seleccionar y subir uno o varios manuales en formato PDF.
 * **Indexación:** Haz clic en el botón de indexación para activar el pipeline de fragmentación y vectorización en ChromaDB.
 * **Consulta interactiva:** Realiza tus preguntas técnicas en el chat principal y despliega el acordeón de fuentes para verificar la trazabilidad exacta de cada respuesta. Valida los resultados utilizando los botones de feedback inferiores.
-
-```
-
-```
