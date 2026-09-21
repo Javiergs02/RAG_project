@@ -51,6 +51,22 @@ def consultar_api(pregunta):
     )
     return response
 
+def enviar_feedback_api(pregunta, respuesta, fuentes, valoracion):
+    """Envía la valoración del usuario al backend para guardarla en los logs."""
+    try:
+        requests.post(
+            f"{API_URL}/feedback",
+            json={
+                "pregunta": pregunta,
+                "respuesta": respuesta,
+                "fuentes": fuentes,
+                "valoracion": valoracion
+            },
+            timeout=5
+        )
+    except Exception:
+        st.error(f"Error de conexión al guardar el voto: {e}")
+        # Si el log falla, no queremos bloquear la interfaz al usuario
 
 # --- BARRA LATERAL (SIDEBAR): GESTIÓN DOCUMENTAL ---
 with st.sidebar:
@@ -119,13 +135,29 @@ if not st.session_state.documentos_activos:
         st.info("👈 Comienza subiendo uno o más documentos PDF en la barra lateral para iniciar la sesión.")
 
 # Mostrar mensajes anteriores del historial
-for msg in st.session_state.messages:
+for i, msg in enumerate(st.session_state.messages):
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
         if msg.get("sources"):
             with st.expander("📍 Fuentes consultadas"):
                 for fuente in msg["sources"]:
                     st.markdown(f"- {fuente}")
+        
+        # Mostrar botones de feedback solo en las respuestas del asistente
+        if msg["role"] == "assistant" and "pregunta_asociada" in msg:
+            # st.feedback devuelve 1 (pulgar arriba) o 0 (pulgar abajo)
+            feedback = st.feedback("thumbs", key=f"fb_{i}")
+            
+            # Si el usuario hace clic y no lo hemos registrado aún en esta sesión
+            if feedback is not None and not msg.get("feedback_registrado"):
+                enviar_feedback_api(
+                    pregunta=msg["pregunta_asociada"],
+                    respuesta=msg["content"],
+                    fuentes=msg.get("sources", []),
+                    valoracion=feedback
+                )
+                # Marcamos para que no se envíe el mismo log múltiples veces
+                st.session_state.messages[i]["feedback_registrado"] = True
 
 # Captura de nuevas preguntas
 if prompt := st.chat_input("Escribe tu pregunta sobre la documentación cargada..."):
@@ -150,18 +182,21 @@ if prompt := st.chat_input("Escribe tu pregunta sobre la documentación cargada.
                             for fuente in fuentes:
                                 st.markdown(f"- {fuente}")
 
-                    # Guardar respuesta en el historial de sesión
+                    # Guardar respuesta en el historial de sesión (incluyendo la pregunta asociada)
                     st.session_state.messages.append({
                         "role": "assistant",
                         "content": contenido_respuesta,
-                        "sources": fuentes
+                        "sources": fuentes,
+                        "pregunta_asociada": prompt,
+                        "feedback_registrado": False
                     })
+                    st.rerun() # Refresca la UI para que aparezcan los botones de feedback
                 elif res.status_code == 400:
                     mensaje_alerta = res.json().get("detail", "Error en la consulta.")
                     st.warning(mensaje_alerta)
                 else:
                     st.error(f"Error {res.status_code}: {res.text}")
             except requests.exceptions.ConnectionError:
-                st.error("No se pudo conectar con el motor RAG (FastAPI). Comprueba la conexión de red entre contenedores.")
+                st.error("No se pudo conectar con el motor RAG.")
             except Exception as e:
-                st.error(f"Error al procesar la solicitud: {str(e)}")
+                st.error(f"Error al procesar la solicitud: {str(e)}") 

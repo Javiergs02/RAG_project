@@ -1,10 +1,13 @@
 import os
 import shutil
+import json
+import chromadb
+import ollama
+from datetime import datetime
 from typing import List
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
-import chromadb
-import ollama
+
 
 # Importamos las herramientas de ingesta que configuraremos en ingesta.py
 from src.ingesta import procesar_documentos_y_crear_chunks, get_embedding_function
@@ -25,6 +28,12 @@ class QueryRequest(BaseModel):
 class QueryResponse(BaseModel):
     respuesta: str
     fuentes: List[str]
+
+class FeedbackRequest(BaseModel):
+    pregunta: str
+    respuesta: str
+    fuentes: List[str]
+    valoracion: int  # 1 para 👍, 0 para 👎
 
 
 # --- ENDPOINT 1: ESTADO DEL SISTEMA ---
@@ -138,8 +147,26 @@ async def consultar_rag(request: QueryRequest):
             respuesta=respuesta_llm["message"]["content"],
             fuentes=fuentes_unicas
         )
-
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generando respuesta: {str(e)}")
+
+@app.post("/feedback")
+async def registrar_feedback(req: FeedbackRequest):
+    try:
+        os.makedirs("data/logs", exist_ok=True)
+        ruta_log = "data/logs/interacciones.jsonl"
+        with open(ruta_log, "a", encoding="utf-8") as f:
+            log_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "pregunta": req.pregunta,
+                "respuesta": req.respuesta,
+                "fuentes": req.fuentes,
+                "valoracion": req.valoracion
+            }
+            f.write(json.dumps(log_entry) + "\n")
+            
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error guardando log: {str(e)}")
