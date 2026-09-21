@@ -9,3 +9,5 @@ datasets
 fastapi
 uvicorn
 streamlit
+python-multipart
+ollama

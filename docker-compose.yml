@@ -4,6 +4,9 @@ services:
     container_name: rag_backend
     ports:
       - "8000:8000"
+    # ESTO ES LA CLAVE: Permite al contenedor ver tu Ollama local
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - .:/app 
       # Actualizamos la ruta del volumen de Chroma a la nueva carpeta
